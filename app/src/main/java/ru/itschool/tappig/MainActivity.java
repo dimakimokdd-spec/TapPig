@@ -1,5 +1,7 @@
 package ru.itschool.tappig;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
@@ -12,11 +14,11 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 public class MainActivity extends AppCompatActivity {
-
     int nTaps;
     TextView textTop;
     TextView textBottom;
     ImageView imgPig;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,10 +33,22 @@ public class MainActivity extends AppCompatActivity {
         textTop = findViewById(R.id.textTop);
         textBottom = findViewById(R.id.textBottom);
         imgPig = findViewById(R.id.imagePig);
+        loadPigs();
+        updateTextBottom();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        savePigs();
     }
 
     public void tap(View view) {
         nTaps++;
+        updateTextBottom();
+    }
+
+    void updateTextBottom() {
         textBottom.setText("Вы потрогали "+nTaps+end());
     }
 
@@ -45,4 +59,15 @@ public class MainActivity extends AppCompatActivity {
         return " раз";
     }
 
+    // Сохранение
+    public void savePigs() {
+        SharedPreferences prefs = getSharedPreferences("PiggyPrefs", Context.MODE_PRIVATE);
+        prefs.edit().putInt("numtaps", nTaps).apply();
+    }
+
+    // Загрузка
+    public void loadPigs() {
+        SharedPreferences prefs = getSharedPreferences("PiggyPrefs", Context.MODE_PRIVATE);
+        nTaps = prefs.getInt("numtaps", 0);
+    }
 }
